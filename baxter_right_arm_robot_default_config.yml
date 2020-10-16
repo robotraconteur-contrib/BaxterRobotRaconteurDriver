@@ -1,11 +1,11 @@
-device_info:
+﻿device_info:
   device:
-    name: baxter_robot
+    name: baxter_robot_right_arm
   manufacturer:
     name: Rethink_Robotics
     uuid: 82d22757-bbfc-44ca-9edb-8824c4a1943e
   model:
-    name: dual_arm
+    name: Baxter
     uuid: 4e4a8836-48e6-48af-b92d-15eee64fa668
   user_description: Rethink Robotics Baxter Robot
   serial_number: 123456789
@@ -14,12 +14,12 @@ device_info:
         name: robot
         uuid: 39b513e7-21b9-4b49-8654-7537473030eb
       subclasses: 
-        - dual_arm
-        - dual_arm_fourteen_axis
+        - serial
+        - serial_seven_axis
         - cobot
   implemented_types:
     - com.robotraconteur.robotics.robot.Robot
-robot_type: dual_arm
+robot_type: serial
 robot_capabilities:
 - jog_command
 - trajectory_command
@@ -184,162 +184,6 @@ chains:
     iyz: -6.951229839419105e-06
     izz: 0.0005548667735373539
     m: 0.54218
-- kin_chain_identifier: left_arm
-  H:
-  - x: 0.0
-    y: 0.0
-    z: 1.0
-  - x: -0.7071080798594735
-    y: 0.7071054825112363
-    z: 4.896638650109253e-12
-  - x: 0.7071054825077738
-    y: 0.707108079862936
-    z: 4.89663865013323e-12
-  - x: -0.707108079862936
-    y: 0.7071054825077738
-    z: 9.793277300194529e-12
-  - x: 0.7071054825043114
-    y: 0.7071080798663985
-    z: 4.896638650181184e-12
-  - x: -0.7071080798663985
-    y: 0.7071054825043114
-    z: 1.4689915950279805e-11
-  - x: 0.7071054825008489
-    y: 0.7071080798698609
-    z: 4.896638650253115e-12
-  P:
-  - x: 0.06402723984846331
-    y: 0.2590273845077734
-    z: 0.129626
-  - x: 0.048790278293275306
-    y: 0.04879045751030368
-    z: 0.27035
-  - x: 0.0721247592161461
-    y: 0.0721250241456663
-    z: 0.0
-  - x: 0.18555862071969
-    y: 0.18555930231810946
-    z: -0.06899999999871503
-  - x: 0.0732490569329803
-    y: 0.07324932599300155
-    z: 2.4837700392782766e-24
-  - x: 0.19141345411388247
-    y: 0.19141415721993793
-    z: -0.00999999999867448
-  - x: 0.08200655833343751
-    y: 0.08200685956250556
-    z: 8.342172901977934e-24
-  - x: 0.0802918275379714
-    y: 0.08029212246922271
-    z: 5.560133187362412e-13
-  flange_identifier: left_hand
-  flange_pose:
-    orientation:
-      w: 0.6532812339450026
-      x: -0.27059864998154065
-      y: 0.6532812339457787
-      z: 0.27059864999246236
-    position:
-      x: 0.0
-      y: 0.0
-      z: 0.0
-  joint_numbers:
-  - 7
-  - 8
-  - 9
-  - 10
-  - 11
-  - 12
-  - 13
-  link_inertias:
-  - com:
-      x: 0.0
-      y: 0.0
-      z: 0.0
-    ixx: 1.84915501
-    ixy: -0.000354
-    ixz: -0.154188
-    iyy: 1.66267101
-    iyz: 0.003292
-    izz: 0.8022390100000001
-    m: 35.336555000000004
-  - com:
-      x: 0.01783
-      y: 0.0008599999999999999
-      z: 0.19126999999999997
-    ixx: 0.04709102262000006
-    ixy: 0.00012787555999999996
-    ixz: 0.006148700389999998
-    iyy: 0.03766976455000004
-    iyz: 0.0007808689899999999
-    izz: 0.03595988478
-    m: 5.70044
-  - com:
-      x: 0.06845000000000001
-      y: 0.0026900000000000006
-      z: -0.005290000000000001
-    ixx: 0.01175209419
-    ixy: -0.0003009639799999998
-    ixz: 0.0020767576199999995
-    iyy: 0.027885975199999996
-    iyz: -0.00018821993
-    izz: 0.020787492979999996
-    m: 3.2269799999999997
-  - com:
-      x: -0.00276
-      y: 0.00132
-      z: 0.18086
-    ixx: 0.02661733557000001
-    ixy: 0.00029270634
-    ixz: 0.003921898870000001
-    iyy: 0.02844355206999999
-    iyz: 0.0010838933
-    izz: 0.01248008322
-    m: 4.31272
-  - com:
-      x: 0.02611
-      y: 0.00159
-      z: -0.01117
-    ixx: 0.00711582686
-    ixy: 0.00036036173
-    ixz: 0.0007459495999999999
-    iyy: 0.01318227876
-    iyz: -0.00019663418
-    izz: 0.00926852064
-    m: 2.07206
-  - com:
-      x: -0.00168
-      y: 0.0046
-      z: 0.13952
-    ixx: 0.01667742825
-    ixy: 0.00018403705
-    ixz: 0.00018657628999999996
-    iyy: 0.01675457264
-    iyz: -0.0006473235199999999
-    izz: 0.0037463115
-    m: 2.24665
-  - com:
-      x: 0.06041
-      y: 0.00697
-      z: 0.006
-    ixx: 0.0038760715199999997
-    ixy: -0.00044384783999999993
-    ixz: -0.00021115038
-    iyy: 0.007005379140000001
-    iyz: 0.00015348067
-    izz: 0.0055275524
-    m: 1.60979
-  - com:
-      x: 0.005137046552805342
-      y: 0.0009572236157733594
-      z: 0.0066026070677634744
-    ixx: 0.0005708635291736186
-    ixy: 8.143398947824061e-06
-    ixz: 6.02945024853024e-05
-    iyy: 0.0006324462976435547
-    iyz: -6.951229839419105e-06
-    izz: 0.0005548667735373539
-    m: 0.54218
 joint_info:
 - default_effort_units: newton_meter
   default_units: radian
@@ -349,6 +193,7 @@ joint_info:
     lower: -1.70167993878
     upper: 1.70167993878
     velocity: 1.5
+    acceleration: 2.0
   joint_type: revolute
   passive: false
 - default_effort_units: newton_meter
@@ -359,6 +204,7 @@ joint_info:
     lower: -2.147
     upper: 1.047
     velocity: 1.5
+    acceleration: 2.0
   joint_type: revolute
   passive: false
 - default_effort_units: newton_meter
@@ -369,6 +215,7 @@ joint_info:
     lower: -3.05417993878
     upper: 3.05417993878
     velocity: 1.5
+    acceleration: 2.0
   joint_type: revolute
   passive: false
 - default_effort_units: newton_meter
@@ -379,6 +226,7 @@ joint_info:
     lower: -0.05
     upper: 2.618
     velocity: 1.5
+    acceleration: 2.0
   joint_type: revolute
   passive: false
 - default_effort_units: newton_meter
@@ -389,6 +237,7 @@ joint_info:
     lower: -3.059
     upper: 3.059
     velocity: 4.0
+    acceleration: 2.0
   joint_type: revolute
   passive: false
 - default_effort_units: newton_meter
@@ -399,6 +248,7 @@ joint_info:
     lower: -1.57079632679
     upper: 2.094
     velocity: 4.0
+    acceleration: 2.0
   joint_type: revolute
   passive: false
 - default_effort_units: newton_meter
@@ -409,75 +259,6 @@ joint_info:
     lower: -3.059
     upper: 3.059
     velocity: 4.0
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_s0
-  joint_limits:
-    effort: 50.0
-    lower: -1.70167993878
-    upper: 1.70167993878
-    velocity: 1.5
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_s1
-  joint_limits:
-    effort: 100.0
-    lower: -2.147
-    upper: 1.047
-    velocity: 1.5
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_e0
-  joint_limits:
-    effort: 50.0
-    lower: -3.05417993878
-    upper: 3.05417993878
-    velocity: 1.5
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_e1
-  joint_limits:
-    effort: 50.0
-    lower: -0.05
-    upper: 2.618
-    velocity: 1.5
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_w0
-  joint_limits:
-    effort: 15.0
-    lower: -3.059
-    upper: 3.059
-    velocity: 4.0
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_w1
-  joint_limits:
-    effort: 15.0
-    lower: -1.57079632679
-    upper: 2.094
-    velocity: 4.0
-  joint_type: revolute
-  passive: false
-- default_effort_units: newton_meter
-  default_units: radian
-  joint_identifier: left_w2
-  joint_limits:
-    effort: 15.0
-    lower: -3.059
-    upper: 3.059
-    velocity: 4.0
+    acceleration: 2.0
   joint_type: revolute
   passive: false

@@ -15,9 +15,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Mono.Options;
-using RobotRaconteurWeb;
-using RobotRaconteurWeb.InfoParser;
+using RobotRaconteur;
+using RobotRaconteur.Companion.InfoParser;
 
 namespace BaxterRobotRaconteurDriver
 {
@@ -28,9 +29,13 @@ namespace BaxterRobotRaconteurDriver
 
             bool shouldShowHelp = false;
             string robot_info_file = null;
+            bool left_arm = false;
+            bool right_arm = false;
 
             var options = new OptionSet {
                 { "robot-info-file=", n => robot_info_file = n },
+                { "left-arm",  n => left_arm = n!=null },
+                { "right-arm",  n => right_arm = n!=null },
                 { "h|help", "show this message and exit", h => shouldShowHelp = h != null }
             };
 
@@ -64,27 +69,50 @@ namespace BaxterRobotRaconteurDriver
                 return 1;
             }
 
+            string nodename = "baxter_robot";
+
+            BaxterRobotArmSelection arm_selection;
+            if ((!left_arm && !right_arm) || right_arm && left_arm)
+            {
+                arm_selection = BaxterRobotArmSelection.both;
+            }
+            else if (left_arm)
+            {
+                arm_selection = BaxterRobotArmSelection.left;
+                nodename = "baxter_robot_left_arm";
+            }
+            else if (right_arm)
+            {
+                arm_selection = BaxterRobotArmSelection.right;
+                nodename = "baxter_robot_right_arm";
+            }
+            else
+            {
+                throw new ArgumentException("Invalid arm selection");
+            }
+
+            ushort port = 58660;
+            if (arm_selection == BaxterRobotArmSelection.right)
+            {
+                port = 58661;
+            }
 
             var robot_info = RobotInfoParser.LoadRobotInfoYamlWithIdentifierLocks(robot_info_file);
             using (robot_info.Item2)
             {
 
-                ros_csharp_interop.ros_csharp_interop.init_ros(args, "baxter_robotraconteur_driver", false);
+                ros_csharp_interop.ros_csharp_interop.init_ros(args, "baxter_robotraconteur_driver", true);
 
 
-                using (var robot = new BaxterRobot(robot_info.Item1, ""))
+                using (var robot = new BaxterRobot(robot_info.Item1, arm_selection, ""))
                 {
                     robot._start_robot();
-                    using (var node_setup = new ServerNodeSetup("baxter_robot", 58654))
+                    using (var node_setup = new ServerNodeSetup(nodename, port, args))
                     {
-
-
-                        RobotRaconteurNode.s.RegisterService("baxter", "com.robotraconteur.robotics.robot", robot);
+                        RobotRaconteurNode.s.RegisterService("robot", "com.robotraconteur.robotics.robot", robot);
 
                         Console.WriteLine("Press enter to exit");
                         Console.ReadKey();
-
-                        RobotRaconteurNode.s.Shutdown();
                     }
                 }
             }

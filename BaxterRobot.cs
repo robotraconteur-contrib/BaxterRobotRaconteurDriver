@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using RobotRaconteurWeb;
+using RobotRaconteur;
 using com.robotraconteur.robotics.robot;
 using System.IO;
 using System.Linq;
@@ -30,10 +30,18 @@ using System.Threading.Tasks;
 using com.robotraconteur.geometry;
 using com.robotraconteur.action;
 using com.robotraconteur.robotics.trajectory;
-using RobotRaconteurWeb.StandardRobDefLib.Robot;
+using RobotRaconteur.Companion.Robot;
 
 namespace BaxterRobotRaconteurDriver
 {
+
+    public enum BaxterRobotArmSelection
+    {
+        both = 0,
+        left = 1,
+        right = 2
+    }
+
     public class BaxterRobot : AbstractRobot, IDisposable
     {
         protected ROSNode _ros_node;
@@ -42,7 +50,8 @@ namespace BaxterRobotRaconteurDriver
         protected Subscriber<ros_csharp_interop.rosmsg.gen.sensor_msgs.JointState> _joint_states_sub;
         protected Subscriber<AssemblyState> _robot_state_sub;
         protected Subscriber<EndpointState> _endpoint_state_sub;
-        protected Publisher<JointCommand> _joint_command_pub;
+        protected Publisher<JointCommand> _joint_command_pub_right;
+        protected Publisher<JointCommand> _joint_command_pub_left;
         protected Publisher<Empty> _set_super_reset_pub;
         protected Publisher<Empty> _set_super_stop_pub;
         protected Publisher<Bool> _set_super_enable_pub;
@@ -53,31 +62,86 @@ namespace BaxterRobotRaconteurDriver
 
         protected string[] _digital_io_names = {  };
 
+        protected string[] _joint_names_right;
+        protected string[] _joint_names_left;
 
-        public BaxterRobot(com.robotraconteur.robotics.robot.RobotInfo robot_info, string ros_ns_prefix = "") : base(robot_info, 7)
+        BaxterRobotArmSelection _arm_selection;
+
+
+        public BaxterRobot(com.robotraconteur.robotics.robot.RobotInfo robot_info, BaxterRobotArmSelection arm_selection, string ros_ns_prefix = "") : base(robot_info, 14)
         {
             this._ros_ns_prefix = "";
             if (robot_info.joint_info == null)
             {
-                _joint_names = new string[] { "right_s0", "right_s1", "right_e0", "right_e1",
-                "right_w0", "right_w1", "right_w2", "left_s0", "left_s1", "left_e0", "left_e1",
-                "left_w0", "left_w1", "left_w2" };
+                throw new ArgumentException("Robot joint info must be provided");
             }
+
+            _joint_names_right = new string[] { "right_s0", "right_s1", "right_e0", "right_e1",
+                "right_w0", "right_w1", "right_w2" };
+
+            _joint_names_left = new string[] { "left_s0", "left_s1", "left_e0", "left_e1",
+                "left_w0", "left_w1", "left_w2"};
+
+            switch (arm_selection)
+            {
+                case BaxterRobotArmSelection.both:
+                    {
+                        string[] _both_joint_names = new string[] { "left_s0", "left_s1", "left_e0", "left_e1",
+                            "left_w0", "left_w1", "left_w2", "right_s0", "right_s1", "right_e0", "right_e1",
+                            "right_w0", "right_w1", "right_w2" };
+
+                        if (!Enumerable.SequenceEqual(_joint_names,_both_joint_names))
+                        {
+                            throw new ArgumentException("Invalid joint names specified for both arms");
+                        }
+
+                        _arm_selection = BaxterRobotArmSelection.both;
+                        break;
+                    }
+
+                case BaxterRobotArmSelection.left:
+                    {
+                        if (!Enumerable.SequenceEqual(_joint_names, _joint_names_left))
+                        {
+                            throw new ArgumentException("Invalid joint names specified for left arm");
+                        }
+                        _arm_selection = BaxterRobotArmSelection.left;
+                        break;
+                    }
+                case BaxterRobotArmSelection.right:
+                    {
+                        if (!Enumerable.SequenceEqual(_joint_names, _joint_names_right))
+                        {
+                            throw new ArgumentException("Invalid joint names specified for right arm");
+                        }
+                        _arm_selection = BaxterRobotArmSelection.right;
+                        break;
+                    }
+                default:
+                    throw new ArgumentException("Invalid arm selection");
+            }            
         }
 
         
 
         public override void _start_robot()
-        {  
+        {
             //TODO: remove this
-
 
 
             _ros_node = new ROSNode();
             _joint_states_sub = _ros_node.subscribe<ros_csharp_interop.rosmsg.gen.sensor_msgs.JointState>(_ros_ns_prefix + "robot/joint_states", 1, _joint_state_cb); ;
-            _robot_state_sub = _ros_node.subscribe<AssemblyState>(_ros_ns_prefix + "robot/state", 1, _robot_state_cb); ;
-            _endpoint_state_sub = _ros_node.subscribe<EndpointState>(_ros_ns_prefix + "robot/limb/right/endpoint_state", 1, _endpoint_state_cb); ;
-            _joint_command_pub = _ros_node.advertise<JointCommand>(_ros_ns_prefix + "robot/limb/right/joint_command", 1, false);
+            _robot_state_sub = _ros_node.subscribe<AssemblyState>(_ros_ns_prefix + "robot/state", 1, _robot_state_cb);
+            if (_arm_selection != BaxterRobotArmSelection.right)
+            {
+                _endpoint_state_sub = _ros_node.subscribe<EndpointState>(_ros_ns_prefix + "robot/limb/left/endpoint_state", 1, x => _endpoint_state_cb(x, 0));
+                _joint_command_pub_left = _ros_node.advertise<JointCommand>(_ros_ns_prefix + "robot/limb/left/joint_command", 1, false);
+            }
+            if (_arm_selection != BaxterRobotArmSelection.left)
+            {
+                _endpoint_state_sub = _ros_node.subscribe<EndpointState>(_ros_ns_prefix + "robot/limb/right/endpoint_state", 1, x => _endpoint_state_cb(x, _arm_selection == BaxterRobotArmSelection.right ? 0 : 1));
+                _joint_command_pub_right = _ros_node.advertise<JointCommand>(_ros_ns_prefix + "robot/limb/right/joint_command", 1, false);
+            }
             _set_super_reset_pub = _ros_node.advertise<Empty>(_ros_ns_prefix + "robot/set_super_reset", 1, false);
             _set_super_stop_pub = _ros_node.advertise<Empty>(_ros_ns_prefix + "robot/set_super_stop", 1, false);
             _set_super_enable_pub = _ros_node.advertise<Bool>(_ros_ns_prefix + "robot/set_super_enable", 1, false);
@@ -100,16 +164,19 @@ namespace BaxterRobotRaconteurDriver
             lock(this)
             {
                 _last_robot_state = _stopwatch.ElapsedMilliseconds;
-                                
-                _ready = msg.ready;
+                
+                // TODO: check on real robot?
+                _ready = msg.enabled; //msg.ready;
                 _enabled = msg.enabled;
                 _stopped = msg.stopped;
                 _error = msg.error;
                 _estop_source = msg.estop_source;
+
+                _operational_mode = RobotOperationalMode.cobot;
             }
         }
 
-        protected internal void _endpoint_state_cb(EndpointState msg)
+        protected internal void _endpoint_state_cb(EndpointState msg, int kin_chain)
         {
             lock (this)
             {
@@ -139,8 +206,24 @@ namespace BaxterRobotRaconteurDriver
                 v.linear.y = msg.twist.linear.y;
                 v.linear.z = msg.twist.linear.z;
 
-                _endpoint_pose = p;
-                _endpoint_vel = v;
+                if (_endpoint_pose == null)
+                {
+                    if (_arm_selection == BaxterRobotArmSelection.both)
+                    {
+                        _endpoint_pose = new Pose[2];
+                    }
+                    else
+                    {
+                        _endpoint_pose = new Pose[1];
+                    }
+                    _endpoint_pose[kin_chain] = p;
+                }
+
+                if (_endpoint_vel == null)
+                {
+                    _endpoint_vel = new SpatialVelocity[2];
+                    _endpoint_vel[kin_chain] = v;
+                }
             }
         }
 
@@ -150,7 +233,8 @@ namespace BaxterRobotRaconteurDriver
             _joint_states_sub?.Dispose();
             _robot_state_sub?.Dispose();
             _endpoint_state_sub?.Dispose();
-            _joint_command_pub?.Dispose();
+            _joint_command_pub_left?.Dispose();
+            _joint_command_pub_right?.Dispose();
             _set_super_reset_pub?.Dispose();
             _set_super_stop_pub?.Dispose();
             _set_super_enable_pub?.Dispose();
@@ -280,29 +364,99 @@ namespace BaxterRobotRaconteurDriver
         {
             if (joint_pos_cmd != null)
             {
-                var msg = new JointCommand();
-                //msg.header = new Header();
-                msg.mode = 1;
-                msg.names = _joint_names;
-                msg.command = joint_pos_cmd;
-                _joint_command_pub.publish(msg);
-                return;
+                switch (_arm_selection)
+                {
+                    case BaxterRobotArmSelection.left:
+                        {
+                            var msg_left = new JointCommand();
+                            msg_left.mode = 1;
+                            msg_left.names = _joint_names_left;
+                            msg_left.command = joint_pos_cmd;
+                            _joint_command_pub_left.publish(msg_left);
+                            return;
+                        }
+                    case BaxterRobotArmSelection.right:
+                        {
+                            var msg_right = new JointCommand();
+                            msg_right.mode = 1;
+                            msg_right.names = _joint_names_right;
+                            msg_right.command = joint_pos_cmd;
+                            _joint_command_pub_right.publish(msg_right);
+                            return;
+                        }
+                    case BaxterRobotArmSelection.both:
+                        {
+
+                            var msg_left = new JointCommand();
+                            msg_left.mode = 1;
+                            msg_left.names = _joint_names_left;
+                            var left_pos_cmd = new double[7];
+                            for (int i = 0; i < 7; i++) left_pos_cmd[i] = joint_pos_cmd[i];
+                            msg_left.command = left_pos_cmd;
+                            _joint_command_pub_left.publish(msg_left);
+
+                            var msg_right = new JointCommand();
+                            msg_right.mode = 1;
+                            msg_right.names = _joint_names_right;
+                            var right_pos_cmd = new double[7];
+                            for (int i = 0; i < 7; i++) right_pos_cmd[i] = joint_pos_cmd[i + 7];
+                            msg_right.command = right_pos_cmd;
+                            _joint_command_pub_right.publish(msg_right);
+                            return;
+                        }
+                    default:
+                        break;
+                }
+            
             }
 
             if (joint_vel_cmd != null)
             {
-                var msg = new JointCommand();
-                //msg.header = new Header();
-                msg.mode = 2;
-                msg.names = _joint_names;
-                msg.command = joint_vel_cmd;
-                _joint_command_pub.publish(msg);
-                return;
+                switch (_arm_selection)
+                {
+                    case BaxterRobotArmSelection.left:
+                        {
+                            var msg_left = new JointCommand();
+                            msg_left.mode = 2;
+                            msg_left.names = _joint_names_left;                            
+                            msg_left.command = joint_vel_cmd;
+                            _joint_command_pub_left.publish(msg_left);
+                            return;
+                        }
+                    case BaxterRobotArmSelection.right:
+                        {
+                            var msg_right = new JointCommand();
+                            msg_right.mode = 2;
+                            msg_right.names = _joint_names_right;
+                            msg_right.command = joint_vel_cmd;
+                            _joint_command_pub_right.publish(msg_right);
+                            return;
+                        }
+                    case BaxterRobotArmSelection.both:
+                        {
+                            var msg_left = new JointCommand();
+                            msg_left.mode = 2;
+                            msg_left.names = _joint_names_left;
+                            var left_vel_cmd = new double[7];
+                            for (int i = 0; i < 7; i++) left_vel_cmd[i] = joint_vel_cmd[i];
+                            msg_left.command = left_vel_cmd;
+                            _joint_command_pub_left.publish(msg_left);
+
+                            var msg_right = new JointCommand();
+                            msg_right.mode = 2;
+                            msg_right.names = _joint_names_right;
+                            var right_vel_cmd = new double[7];
+                            for (int i = 0; i < 7; i++) right_vel_cmd[i] = joint_vel_cmd[i + 7];
+                            msg_right.command = right_vel_cmd;
+                            _joint_command_pub_right.publish(msg_right);
+                            return;
+                        }
+                }
             }
         }
         
         
-        public override Task<double[]> getf_signal(string signal_name, CancellationToken rr_cancel = default)
+        public override Task<double[]> async_getf_signal(string signal_name, int timeout = -1)
         {
             lock (this)
             {
@@ -327,7 +481,7 @@ namespace BaxterRobotRaconteurDriver
             throw new ArgumentException("Invalid signal name");            
         }
 
-        public override Task setf_signal(string signal_name, double[] value_, CancellationToken rr_cancel = default)
+        public override Task async_setf_signal(string signal_name, double[] value_, int timeout = -1)
         {
             if (_digital_io_names.Contains(signal_name))
             {
@@ -349,16 +503,6 @@ namespace BaxterRobotRaconteurDriver
             }
 
             throw new ArgumentException("Unknown signal_name");
-        }
-
-        internal int _sawyer_joint_count => _joint_count;
-        internal string[] _sawyer_joint_names => _joint_names;
-        internal bool _sawyer_homed => _homed;
-        internal bool _sawyer_enabled => _enabled;
-        internal RobotCommandMode _sawyer_command_mode => _command_mode;
-        internal void _sawyer_send_disable()
-        {
-            _send_disable().ContinueWith(t => { });
         }
     }
 }

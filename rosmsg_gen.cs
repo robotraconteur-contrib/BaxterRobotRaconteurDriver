@@ -547,6 +547,84 @@ for (int i=0; i<msg.Length; i++) ROSWrite(writer, msg[i]);
 }
 namespace baxter_core_msgs
 {
+[ROSMsgInfo("baxter_core_msgs/EndEffectorState","ade777f069d738595bc19e246b8ec7a0","#\ntime timestamp              # time when state was updated\nuint32 id                   # EndEffectorId\n#\n# The following State fields are tristate: 0 = false; 1 = true; 2 = unknown/unsupported\n  uint8   STATE_FALSE = 0\n  uint8   STATE_TRUE = 1\n  uint8   STATE_UNKNOWN = 2\n#\nuint8   enabled             # true if enabled\nuint8   calibrated          # true if calibration has completed\nuint8   ready               # true if ready for another command\nuint8   moving              # true if moving\nuint8   gripping            # true if gripping\nuint8   missed              # true if GRIP/GOTO/SET was commanded and the gripper reaches the end of travel\nuint8   error               # true if the gripper is in an error state\nuint8   reverse             # true if the gripper is in reverse mode\n#\nfloat32 position            # position as a percentage of the max position;      0=closed - 100=open\n#\n  float32 POSITION_CLOSED = 0.0\n  float32 POSITION_OPEN   = 100.0\n#\nfloat32 force               # force as a percentage of max force;                0=none   - 100=max\n#\n  float32 FORCE_MIN = 0.0\n  float32 FORCE_MAX = 100.0\n#\nstring state                # JSON: other state information\n#\nstring command              # from the last command message\nstring command_sender\nuint32 command_sequence\n#\n")]
+public class EndEffectorState : ROSMsg
+{
+public string _type => "baxter_core_msgs/EndEffectorState";
+public string _md5sum => "ade777f069d738595bc19e246b8ec7a0";
+public string _full_text => "#\ntime timestamp              # time when state was updated\nuint32 id                   # EndEffectorId\n#\n# The following State fields are tristate: 0 = false; 1 = true; 2 = unknown/unsupported\n  uint8   STATE_FALSE = 0\n  uint8   STATE_TRUE = 1\n  uint8   STATE_UNKNOWN = 2\n#\nuint8   enabled             # true if enabled\nuint8   calibrated          # true if calibration has completed\nuint8   ready               # true if ready for another command\nuint8   moving              # true if moving\nuint8   gripping            # true if gripping\nuint8   missed              # true if GRIP/GOTO/SET was commanded and the gripper reaches the end of travel\nuint8   error               # true if the gripper is in an error state\nuint8   reverse             # true if the gripper is in reverse mode\n#\nfloat32 position            # position as a percentage of the max position;      0=closed - 100=open\n#\n  float32 POSITION_CLOSED = 0.0\n  float32 POSITION_OPEN   = 100.0\n#\nfloat32 force               # force as a percentage of max force;                0=none   - 100=max\n#\n  float32 FORCE_MIN = 0.0\n  float32 FORCE_MAX = 100.0\n#\nstring state                # JSON: other state information\n#\nstring command              # from the last command message\nstring command_sender\nuint32 command_sequence\n#\n";
+public ROSTime timestamp = default;
+public uint id = default;
+public byte enabled = default;
+public byte calibrated = default;
+public byte ready = default;
+public byte moving = default;
+public byte gripping = default;
+public byte missed = default;
+public byte error = default;
+public byte reverse = default;
+public float position = default;
+public float force = default;
+public string state = default;
+public string command = default;
+public string command_sender = default;
+public uint command_sequence = default;
+public static EndEffectorState ROSRead(BinaryReader reader)
+{
+var o = new EndEffectorState();
+o.timestamp = rosmsg_builtin_util.read_ROSTime(reader);
+o.id = rosmsg_builtin_util.read_uint(reader);
+o.enabled = rosmsg_builtin_util.read_byte(reader);
+o.calibrated = rosmsg_builtin_util.read_byte(reader);
+o.ready = rosmsg_builtin_util.read_byte(reader);
+o.moving = rosmsg_builtin_util.read_byte(reader);
+o.gripping = rosmsg_builtin_util.read_byte(reader);
+o.missed = rosmsg_builtin_util.read_byte(reader);
+o.error = rosmsg_builtin_util.read_byte(reader);
+o.reverse = rosmsg_builtin_util.read_byte(reader);
+o.position = rosmsg_builtin_util.read_float(reader);
+o.force = rosmsg_builtin_util.read_float(reader);
+o.state = rosmsg_builtin_util.read_string(reader);
+o.command = rosmsg_builtin_util.read_string(reader);
+o.command_sender = rosmsg_builtin_util.read_string(reader);
+o.command_sequence = rosmsg_builtin_util.read_uint(reader);
+return o;
+}
+public static EndEffectorState[] ROSReadArray(BinaryReader reader, int count)
+{
+if (count < 0) count = (int)reader.ReadUInt32();
+var o = new EndEffectorState[count];
+for (int i=0; i<count; i++) o[i] = ROSRead(reader);
+return o;
+}
+public static void ROSWrite(BinaryWriter writer, EndEffectorState msg)
+{
+rosmsg_builtin_util.write_ROSTime(writer, msg.timestamp);
+rosmsg_builtin_util.write_uint(writer, msg.id);
+rosmsg_builtin_util.write_byte(writer, msg.enabled);
+rosmsg_builtin_util.write_byte(writer, msg.calibrated);
+rosmsg_builtin_util.write_byte(writer, msg.ready);
+rosmsg_builtin_util.write_byte(writer, msg.moving);
+rosmsg_builtin_util.write_byte(writer, msg.gripping);
+rosmsg_builtin_util.write_byte(writer, msg.missed);
+rosmsg_builtin_util.write_byte(writer, msg.error);
+rosmsg_builtin_util.write_byte(writer, msg.reverse);
+rosmsg_builtin_util.write_float(writer, msg.position);
+rosmsg_builtin_util.write_float(writer, msg.force);
+rosmsg_builtin_util.write_string(writer, msg.state);
+rosmsg_builtin_util.write_string(writer, msg.command);
+rosmsg_builtin_util.write_string(writer, msg.command_sender);
+rosmsg_builtin_util.write_uint(writer, msg.command_sequence);
+}
+public static void ROSWriteArray(BinaryWriter writer, EndEffectorState[] msg, int count)
+{
+rosmsg_builtin_util.do_write_count(writer,msg,count);
+for (int i=0; i<msg.Length; i++) ROSWrite(writer, msg[i]);
+}
+}
+}
+namespace baxter_core_msgs
+{
 [ROSMsgInfo("baxter_core_msgs/DigitalOutputCommand","23f05028c1a699fb83e22401228c3a9e","##the name of the output\nstring name  \n##the value to set output \nbool value   \n")]
 public class DigitalOutputCommand : ROSMsg
 {
@@ -575,6 +653,51 @@ rosmsg_builtin_util.write_string(writer, msg.name);
 rosmsg_builtin_util.write_bool(writer, msg.value);
 }
 public static void ROSWriteArray(BinaryWriter writer, DigitalOutputCommand[] msg, int count)
+{
+rosmsg_builtin_util.do_write_count(writer,msg,count);
+for (int i=0; i<msg.Length; i++) ROSWrite(writer, msg[i]);
+}
+}
+}
+namespace baxter_core_msgs
+{
+[ROSMsgInfo("baxter_core_msgs/EndEffectorCommand","c003234e90416f2ca02ac7837c42cbb7","## Command to be sent to an end effector\nuint32 id       # target end effector id\nstring command  # operation to perform\n# Well known commands:\nstring   CMD_NO_OP           = no_op\nstring   CMD_SET             = set\nstring   CMD_CONFIGURE       = configure\nstring   CMD_REBOOT          = reboot\nstring   CMD_RESET           = reset\nstring   CMD_CALIBRATE       = calibrate\nstring   CMD_CLEAR_CALIBRATION = clear_calibration\nstring   CMD_PREPARE_TO_GRIP = prepare_to_grip\nstring   CMD_GRIP            = grip\nstring   CMD_RELEASE         = release\nstring   CMD_GO              = go\nstring   CMD_STOP            = stop\n#\nstring args     # JSON arguments to the command\n#\nstring sender   # optional identifier, returned in state when the command is handled\nuint32 sequence # optional sequence number, return in state when the command is handled\n\n")]
+public class EndEffectorCommand : ROSMsg
+{
+public string _type => "baxter_core_msgs/EndEffectorCommand";
+public string _md5sum => "c003234e90416f2ca02ac7837c42cbb7";
+public string _full_text => "## Command to be sent to an end effector\nuint32 id       # target end effector id\nstring command  # operation to perform\n# Well known commands:\nstring   CMD_NO_OP           = no_op\nstring   CMD_SET             = set\nstring   CMD_CONFIGURE       = configure\nstring   CMD_REBOOT          = reboot\nstring   CMD_RESET           = reset\nstring   CMD_CALIBRATE       = calibrate\nstring   CMD_CLEAR_CALIBRATION = clear_calibration\nstring   CMD_PREPARE_TO_GRIP = prepare_to_grip\nstring   CMD_GRIP            = grip\nstring   CMD_RELEASE         = release\nstring   CMD_GO              = go\nstring   CMD_STOP            = stop\n#\nstring args     # JSON arguments to the command\n#\nstring sender   # optional identifier, returned in state when the command is handled\nuint32 sequence # optional sequence number, return in state when the command is handled\n\n";
+public uint id = default;
+public string command = default;
+public string args = default;
+public string sender = default;
+public uint sequence = default;
+public static EndEffectorCommand ROSRead(BinaryReader reader)
+{
+var o = new EndEffectorCommand();
+o.id = rosmsg_builtin_util.read_uint(reader);
+o.command = rosmsg_builtin_util.read_string(reader);
+o.args = rosmsg_builtin_util.read_string(reader);
+o.sender = rosmsg_builtin_util.read_string(reader);
+o.sequence = rosmsg_builtin_util.read_uint(reader);
+return o;
+}
+public static EndEffectorCommand[] ROSReadArray(BinaryReader reader, int count)
+{
+if (count < 0) count = (int)reader.ReadUInt32();
+var o = new EndEffectorCommand[count];
+for (int i=0; i<count; i++) o[i] = ROSRead(reader);
+return o;
+}
+public static void ROSWrite(BinaryWriter writer, EndEffectorCommand msg)
+{
+rosmsg_builtin_util.write_uint(writer, msg.id);
+rosmsg_builtin_util.write_string(writer, msg.command);
+rosmsg_builtin_util.write_string(writer, msg.args);
+rosmsg_builtin_util.write_string(writer, msg.sender);
+rosmsg_builtin_util.write_uint(writer, msg.sequence);
+}
+public static void ROSWriteArray(BinaryWriter writer, EndEffectorCommand[] msg, int count)
 {
 rosmsg_builtin_util.do_write_count(writer,msg,count);
 for (int i=0; i<msg.Length; i++) ROSWrite(writer, msg[i]);
