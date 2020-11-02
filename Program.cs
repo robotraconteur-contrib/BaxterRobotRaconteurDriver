@@ -183,6 +183,8 @@ namespace BaxterRobotRaconteurDriver
                 left_tool_info?.Item2?.Dispose();
                 right_tool_info?.Item2?.Dispose();
                 robot?.Dispose();
+                left_gripper?.Dispose();
+                right_gripper?.Dispose();
             }
 
             return 0;
