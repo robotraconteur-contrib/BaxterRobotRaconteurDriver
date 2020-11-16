@@ -23,6 +23,7 @@ using com.robotraconteur.robotics.tool;
 using Mono.Options;
 using RobotRaconteur;
 using RobotRaconteur.Companion.InfoParser;
+using RobotRaconteur.Companion.Util;
 
 namespace BaxterRobotRaconteurDriver
 {
