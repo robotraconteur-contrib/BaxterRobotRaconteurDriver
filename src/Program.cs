@@ -24,6 +24,7 @@ using Mono.Options;
 using RobotRaconteur;
 using RobotRaconteur.Companion.InfoParser;
 using RobotRaconteur.Companion.Util;
+using DrekarLaunchProcess;
 
 namespace BaxterRobotRaconteurDriver
 {
@@ -173,8 +174,12 @@ namespace BaxterRobotRaconteurDriver
                         RobotRaconteurNode.s.RegisterService("right_gripper", "com.robotraconteur.robotics.tool", right_gripper);
                     }
 
-                    Console.WriteLine("Press enter to exit");
-                    Console.ReadKey();
+                    Console.WriteLine("Press Ctrl-C to exit");
+
+                    using (var wait_for_exit = new CWaitForExit())
+                    {
+                        wait_for_exit.WaitForExit();
+                    }
                 }
                 
             }
