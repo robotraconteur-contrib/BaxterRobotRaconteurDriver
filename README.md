@@ -56,6 +56,8 @@ structures. The first seven joints control the left arm, and the right seven joi
 `--left-arm` or `--right-arm` are used, only one arm is controlled by the driver. Start two driver instances to
 control the arms independently. This is useful if the client does not understand two arm robots.
 
+The [common Robot Raconteur node options](https://github.com/robotraconteur/robotraconteur/wiki/Command-Line-Options) are also available.
+
 ## Running With Docker 
 
 Docker is the recommended way to run the driver. Building and running can be complicated due to the dependencies on ROS and C\#.
